@@ -2,15 +2,15 @@
   "title": "As Três Aves",
   "scenes": [
     {
-      "image": "imagens/cena1.jpg",
+      "image": "Persist-nciaEBackEnd/imagens/cena1.jpg",
       "text": "A primeira ave me avisou."
     },
     {
-      "image": "imagens/cena2.jpg",
+      "image": "Persist-nciaEBackEnd/imagens/cena2.jpg",
       "text": "A segunda ave me respondeu."
     },
     {
-      "image": "imagens/cena3.jpg",
+      "image": "Persist-nciaEBackEnd/imagens/cena3.jpg",
       "text": "A terceira ave apenas me julgou pelos pecados do passado."
     }
   ]
