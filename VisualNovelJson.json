@@ -1,0 +1,17 @@
+{
+  "title": "Aventura Misteriosa",
+  "scenes": [
+    {
+      "image": "imagens/cena1.jpg",
+      "text": "Era uma vez, em um reino distante, um jovem chamado Alex que descobriu um mapa misterioso escondido na biblioteca de seu avô."
+    },
+    {
+      "image": "imagens/cena2.jpg",
+      "text": "Após semanas de viagem através de florestas densas e montanhas perigosas, Alex finalmente encontrou a entrada da caverna indicada no mapa."
+    },
+    {
+      "image": "imagens/cena3.jpg",
+      "text": "Dentro da caverna, Alex encontrou não apenas o tesouro, mas também um diário que revelava que seu avô havia sido o último a tentar a jornada."
+    }
+  ]
+}

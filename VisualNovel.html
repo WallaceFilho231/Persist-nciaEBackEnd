@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Novel - Trabalho Servidor Web</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            padding: 20px;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 900px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #fdbb2d;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #fdbb2d;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #4ecdc4;
+        }
+        
+        .server-config {
+            background-color: rgba(30, 30, 50, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .input-group {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        
+        input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+            background-color: #2c2c4b;
+            color: white;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            background-color: #fdbb2d;
+            color: #1a2a6c;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #ffa500;
+        }
+        
+        .github-instructions {
+            background-color: rgba(40, 40, 60, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .github-instructions h4 {
+            color: #fdbb2d;
+            margin-bottom: 10px;
+        }
+        
+        .github-instructions ul {
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .github-instructions code {
+            background-color: #2c2c4b;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        .novel-container {
+            min-height: 400px;
+            background-color: rgba(40, 40, 60, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scene {
+            text-align: center;
+        }
+        
+        .scene-image {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 2px solid #fdbb2d;
+        }
+        
+        .scene-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .nav-button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            background-color: #1a2a6c;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-button:hover {
+            background-color: #2a3a9c;
+        }
+        
+        .nav-button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+        
+        .current-scene {
+            text-align: center;
+            margin-top: 15px;
+            font-style: italic;
+            color: #fdbb2d;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 10;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fdbb2d;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            color: #ff6b6b;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .success-message {
+            color: #4ecdc4;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #444;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .input-group {
+                flex-direction: column;
+            }
+            
+            input {
+                border-radius: 5px;
+                margin-bottom: 10px;
+            }
+            
+            button {
+                border-radius: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Visual Novel Interativa</h1>
+            <h2>Trabalho 1 - Servidor Web</h2>
+        </header>
+        
+        <div class="server-config">
+            <h3>Configuração do Servidor GitHub</h3>
+            <div class="input-group">
+                <input type="text" id="server-url" placeholder="URL base do repositório GitHub (formato raw)">
+                <button id="load-button">Carregar Conteúdo</button>
+            </div>
+            <p class="error-message" id="error-message"></p>
+            <p class="success-message" id="success-message"></p>
+            
+            <div class="github-instructions">
+                <h4>Como usar com GitHub:</h4>
+                <ul>
+                    <li>Crie um repositório no GitHub</li>
+                    <li>Adicione um arquivo <code>data.json</code> com o conteúdo da visual novel</li>
+                    <li>Use o formato RAW: <code>https://raw.githubusercontent.com/USUARIO/REPOSITORIO/BRANCH/</code></li>
+                    <li>Exemplo: <code>https://raw.githubusercontent.com/joaosilva/visual-novel/main/</code></li>
+                </ul>
+                <p>O arquivo JSON deve seguir a estrutura mostrada abaixo.</p>
+            </div>
+        </div>
+        
+        <div class="novel-container">
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Carregando conteúdo do GitHub...</p>
+            </div>
+            
+            <div class="scene" id="scene">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgODAwIDQwMCI+PHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI0MDAiIGZpbGw9IiMzMzMiLz48dGV4dCB4PSIyNTAiIHk9IjIwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI0IiBmaWxsPSIjZmZmIj5JbWFnZW0gZGEgQ2VuYTwvdGV4dD48L3N2Zz4=" alt="Cena da história" class="scene-image">
+                <div class="scene-text">
+                    <p>Configure a URL do servidor GitHub no formato RAW e clique em "Carregar Conteúdo" para iniciar a visual novel.</p>
+                    <p>Exemplo de URL: <code>https://raw.githubusercontent.com/seuusuario/seurepositorio/main/</code></p>
+                </div>
+            </div>
+            
+            <div class="navigation">
+                <button class="nav-button" id="prev-button" disabled>Anterior</button>
+                <button class="nav-button" id="next-button" disabled>Próximo</button>
+            </div>
+            
+            <div class="current-scene">
+                Cena: <span id="current-scene">-</span> / <span id="total-scenes">-</span>
+            </div>
+        </div>
+        
+        <div class="github-instructions">
+            <h4>Estrutura do arquivo JSON:</h4>
+            <pre><code>{
+  "title": "Título da Visual Novel",
+  "scenes": [
+    {
+      "image": "url_imagem_1.jpg",
+      "text": "Texto da primeira cena..."
+    },
+    {
+      "image": "url_imagem_2.jpg",
+      "text": "Texto da segunda cena..."
+    },
+    {
+      "image": "url_imagem_3.jpg",
+      "text": "Texto da terceira cena..."
+    }
+  ]
+}</code></pre>
+        </div>
+        
+        <footer>
+            <p>Trabalho de Servidor Web - Desenvolvido para a disciplina de Programação Web</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const serverUrlInput = document.getElementById('server-url');
+            const loadButton = document.getElementById('load-button');
+            const prevButton = document.getElementById('prev-button');
+            const nextButton = document.getElementById('next-button');
+            const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
+            const loadingElement = document.getElementById('loading');
+            const currentSceneElement = document.getElementById('current-scene');
+            const totalScenesElement = document.getElementById('total-scenes');
+            
+            // Dados padrão para demonstração
+            let scenesData = [];
+            let currentSceneIndex = 0;
+            
+            // URL de exemplo (GitHub raw content)
+            serverUrlInput.value = 'https://raw.githubusercontent.com/joaosilva/visual-novel/main/';
+            
+            // Função para carregar dados do GitHub
+            async function loadDataFromGitHub() {
+                const baseUrl = serverUrlInput.value;
+                const dataUrl = `${baseUrl}data.json`;
+                
+                // Limpar mensagens
+                errorMessage.textContent = '';
+                successMessage.textContent = '';
+                
+                // Validar URL
+                if (!baseUrl.includes('raw.githubusercontent.com')) {
+                    errorMessage.textContent = 'URL deve ser no formato raw do GitHub (raw.githubusercontent.com)';
+                    return;
+                }
+                
+                loadingElement.style.display = 'flex';
+                
+                try {
+                    // Fazer requisição para o arquivo JSON
+                    const response = await fetch(dataUrl);
+                    
+                    if (!response.ok) {
+                        throw new Error(`Erro HTTP: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    // Validar estrutura dos dados
+                    if (!data.scenes || !Array.isArray(data.scenes)) {
+                        throw new Error('Estrutura do JSON inválida. É necessário um array "scenes"');
+                    }
+                    
+                    // Processar cenas - converter URLs relativas para absolutas
+                    scenesData = data.scenes.map(scene => {
+                        return {
+                            image: scene.image.startsWith('http') ? scene.image : `${baseUrl}${scene.image}`,
+                            text: scene.text
+                        };
+                    });
+                    
+                    if (scenesData.length === 0) {
+                        throw new Error('Nenhuma cena encontrada no arquivo JSON');
+                    }
+                    
+                    // Exibir primeira cena
+                    displayScene(0);
+                    prevButton.disabled = true;
+                    nextButton.disabled = scenesData.length <= 1;
+                    
+                    totalScenesElement.textContent = scenesData.length;
+                    successMessage.textContent = `Conteúdo carregado com sucesso! ${scenesData.length} cenas encontradas.`;
+                    
+                } catch (error) {
+                    errorMessage.textContent = 'Erro ao carregar dados: ' + error.message;
+                    scenesData = [];
+                } finally {
+                    loadingElement.style.display = 'none';
+                }
+            }
+            
+            // Função para exibir uma cena
+            function displayScene(index) {
+                if (scenesData.length === 0 || index < 0 || index >= scenesData.length) return;
+                
+                const scene = scenesData[index];
+                const sceneElement = document.getElementById('scene');
+                
+                sceneElement.innerHTML = `
+                    <img src="${scene.image}" alt="Cena ${index + 1}" class="scene-image" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgODAwIDQwMCI+PHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI0MDAiIGZpbGw9IiMzMzMiLz48dGV4dCB4PSIyNTAiIHk9IjIwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI0IiBmaWxsPSIjZmZmIj5JbWFnZW0gbsOjbyBjYXJyZWdhZGE8L3RleHQ+PC9zdmc+'">
+                    <div class="scene-text">
+                        <p>${scene.text}</p>
+                    </div>
+                `;
+                
+                currentSceneIndex = index;
+                currentSceneElement.textContent = index + 1;
+                
+                prevButton.disabled = index === 0;
+                nextButton.disabled = index === scenesData.length - 1;
+            }
+            
+            // Event Listeners
+            loadButton.addEventListener('click', loadDataFromGitHub);
+            
+            prevButton.addEventListener('click', function() {
+                if (currentSceneIndex > 0) {
+                    displayScene(currentSceneIndex - 1);
+                }
+            });
+            
+            nextButton.addEventListener('click', function() {
+                if (currentSceneIndex < scenesData.length - 1) {
+                    displayScene(currentSceneIndex + 1);
+                }
+            });
+            
+            // Carregar dados iniciais para demonstração (se a URL for válida)
+            if (serverUrlInput.value.includes('raw.githubusercontent.com')) {
+                // Descomente a linha abaixo para carregar automaticamente
+                // loadDataFromGitHub();
+            }
+        });
+    </script>
+</body>
+</html>
