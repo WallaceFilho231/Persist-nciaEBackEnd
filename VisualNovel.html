@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visual Novel - Trabalho Servidor Web</title>
+    <title>Visual Novel - Persistência e Backend</title>
     <style>
         * {
             margin: 0;
@@ -92,30 +92,6 @@
         
         button:hover {
             background-color: #ffa500;
-        }
-        
-        .github-instructions {
-            background-color: rgba(40, 40, 60, 0.7);
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-            font-size: 0.9rem;
-        }
-        
-        .github-instructions h4 {
-            color: #fdbb2d;
-            margin-bottom: 10px;
-        }
-        
-        .github-instructions ul {
-            padding-left: 20px;
-            margin-bottom: 10px;
-        }
-        
-        .github-instructions code {
-            background-color: #2c2c4b;
-            padding: 2px 5px;
-            border-radius: 3px;
         }
         
         .novel-container {
@@ -248,31 +224,29 @@
     <div class="container">
         <header>
             <h1>Visual Novel Interativa</h1>
-            <h2>Trabalho 1 - Servidor Web</h2>
+            <h2>Trabalho de Persistência e Backend</h2>
         </header>
         
         <div class="server-config">
-            <h3>Configuração do Servidor GitHub</h3>
+            <h3>Configuração do Servidor</h3>
             <div class="input-group">
-                <input type="text" id="server-url" placeholder="URL base do repositório GitHub (formato raw)">
+                <input type="text" id="server-url" placeholder="URL do servidor (formato raw)">
                 <button id="load-button">Carregar Conteúdo</button>
             </div>
             <p class="error-message" id="error-message"></p>
             <p class="success-message" id="success-message"></p>
-            
-
         </div>
         
         <div class="novel-container">
             <div id="loading" class="loading" style="display: none;">
                 <div class="spinner"></div>
-                <p>Carregando conteúdo do GitHub...</p>
+                <p>Carregando conteúdo...</p>
             </div>
             
             <div class="scene" id="scene">
                 <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgODAwIDQwMCI+PHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI0MDAiIGZpbGw9IiMzMzMiLz48dGV4dCB4PSIyNTAiIHk9IjIwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI0IiBmaWxsPSIjZmZmIj5JbWFnZW0gZGEgQ2VuYTwvdGV4dD48L3N2Zz4=" alt="Cena da história" class="scene-image">
                 <div class="scene-text">
-                    
+                    <p>Informe a URL do servidor e clique em "Carregar Conteúdo" para iniciar a visual novel.</p>
                 </div>
             </div>
             
@@ -286,12 +260,8 @@
             </div>
         </div>
         
-       
-}</code></pre>
-        </div>
-        
         <footer>
-            <p>Trabalho de Servidor Web - Desenvolvido para a disciplina Persistência e Backend</p>
+            <p>Trabalho de Persistência e Backend</p>
         </footer>
     </div>
 
@@ -307,32 +277,23 @@
             const currentSceneElement = document.getElementById('current-scene');
             const totalScenesElement = document.getElementById('total-scenes');
             
-            // Dados padrão para demonstração
             let scenesData = [];
             let currentSceneIndex = 0;
             
-            // URL de exemplo (GitHub raw content)
-            serverUrlInput.value = 'https://raw.githubusercontent.com/joaosilva/visual-novel/main/';
+            // URL de exemplo
+            serverUrlInput.value = 'https://raw.githubusercontent.com/exemplo/visual-novel/main/';
             
-            // Função para carregar dados do GitHub
-            async function loadDataFromGitHub() {
+            // Função para carregar dados do servidor
+            async function loadDataFromServer() {
                 const baseUrl = serverUrlInput.value;
                 const dataUrl = `${baseUrl}data.json`;
                 
-                // Limpar mensagens
                 errorMessage.textContent = '';
                 successMessage.textContent = '';
-                
-                // Validar URL
-                if (!baseUrl.includes('raw.githubusercontent.com')) {
-                    errorMessage.textContent = 'URL deve ser no formato raw do GitHub (raw.githubusercontent.com)';
-                    return;
-                }
                 
                 loadingElement.style.display = 'flex';
                 
                 try {
-                    // Fazer requisição para o arquivo JSON
                     const response = await fetch(dataUrl);
                     
                     if (!response.ok) {
@@ -341,12 +302,10 @@
                     
                     const data = await response.json();
                     
-                    // Validar estrutura dos dados
                     if (!data.scenes || !Array.isArray(data.scenes)) {
-                        throw new Error('Estrutura do JSON inválida. É necessário um array "scenes"');
+                        throw new Error('Estrutura do JSON inválida');
                     }
                     
-                    // Processar cenas - converter URLs relativas para absolutas
                     scenesData = data.scenes.map(scene => {
                         return {
                             image: scene.image.startsWith('http') ? scene.image : `${baseUrl}${scene.image}`,
@@ -355,19 +314,18 @@
                     });
                     
                     if (scenesData.length === 0) {
-                        throw new Error('Nenhuma cena encontrada no arquivo JSON');
+                        throw new Error('Nenhuma cena encontrada');
                     }
                     
-                    // Exibir primeira cena
                     displayScene(0);
                     prevButton.disabled = true;
                     nextButton.disabled = scenesData.length <= 1;
                     
                     totalScenesElement.textContent = scenesData.length;
-                    successMessage.textContent = `Conteúdo carregado com sucesso! ${scenesData.length} cenas encontradas.`;
+                    successMessage.textContent = `Conteúdo carregado! ${scenesData.length} cenas.`;
                     
                 } catch (error) {
-                    errorMessage.textContent = 'Erro ao carregar dados: ' + error.message;
+                    errorMessage.textContent = 'Erro: ' + error.message;
                     scenesData = [];
                 } finally {
                     loadingElement.style.display = 'none';
@@ -396,7 +354,7 @@
             }
             
             // Event Listeners
-            loadButton.addEventListener('click', loadDataFromGitHub);
+            loadButton.addEventListener('click', loadDataFromServer);
             
             prevButton.addEventListener('click', function() {
                 if (currentSceneIndex > 0) {
@@ -409,12 +367,6 @@
                     displayScene(currentSceneIndex + 1);
                 }
             });
-            
-            // Carregar dados iniciais para demonstração (se a URL for válida)
-            if (serverUrlInput.value.includes('raw.githubusercontent.com')) {
-                // Descomente a linha abaixo para carregar automaticamente
-                // loadDataFromGitHub();
-            }
         });
     </script>
 </body>
