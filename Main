@@ -1,0 +1,17 @@
+{
+  "title": "As Três Aves",
+  "scenes": [
+    {
+      "image": "https://raw.githubusercontent.com/WallaceFilho231/Persist-nciaEBackEnd/main/imagens/Cena1.png",
+      "text": "A primeira ave me avisou."
+    },
+    {
+      "image": "https://raw.githubusercontent.com/WallaceFilho231/Persist-nciaEBackEnd/main/imagens/Cena2.png",
+      "text": "A segunda ave me respondeu."
+    },
+    {
+      "image": "https://raw.githubusercontent.com/WallaceFilho231/Persist-nciaEBackEnd/main/imagens/Cena3.png",
+      "text": "A terceira ave apenas me julgou pelos pecados do passado."
+    }    
+  ]
+}
